@@ -1,0 +1,29 @@
+  ==========================
+   MKISOFS 1.12B4 OS/2 port
+  ==========================
+ by Robert Lalla, Loerrach, Germany                rlalla@stepnet.de
+
+
+07/05/98 first OS/2 release
+----------------------------
+  * create CONFIG_H.ADD containing definitions specific to OS/2 port
+  * create BUILD.CMD 
+
+01/16/99 update
+----------------------------
+  * add support for wildcards in command line
+  * fix file open modes (bin/text) for stdout and ".mkisofsrc"
+  * change platform identifier (written into ISO image) to "OS/2"
+  * for multisession support, add new module to read directly from CD 
+    instead of image file only  
+  * clean up BUILD.CMD, add support for CD read
+
+01/23/99 update
+----------------------------
+  * fix multisession error that crashed mkisofs, if new session contains 
+    updated version of a file already present in an earlier session.
+  * allow -C option without -M option. Now it is possible to discard previous
+    sessions completely, or to add data as 2nd session to an audio CD
+  * fix the "-c option without -b" crash by defining a default name
+    for the boot image 
+  * update BUILD.CMD, optionally include debugger support into MKISOFS.EXE

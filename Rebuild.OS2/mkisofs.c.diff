@@ -1,0 +1,95 @@
+*** mkisofs.c.ori	Tue Jun  2 04:43:44 1998
+--- mkisofs.c	Sat Jan 23 15:28:08 1999
+***************
+*** 554,557 ****
+--- 554,561 ----
+    int c;
+  
++ #ifdef __OS2     /* expand wildcards if OS/2 platform */
++   _wildcard(&argc, &argv);
++ #endif
++ 
+    if (argc < 2)
+      usage();
+***************
+*** 767,775 ****
+    if(verbose > 1) fprintf(stderr,"%s\n", version_string);
+  
+!   if(     (cdwrite_data != NULL && merge_image == NULL)
+!        || (cdwrite_data == NULL && merge_image != NULL) )
+      {
+!       fprintf(stderr,"Multisession usage bug - both -C and -M must be specified.\n");
+!       exit(0);
+      }
+  
+--- 771,778 ----
+    if(verbose > 1) fprintf(stderr,"%s\n", version_string);
+  
+!   if(cdwrite_data == NULL && merge_image != NULL)
+      {
+!       fprintf(stderr,"Multisession usage bug: -C must be specified with -M.\n");
+!       exit(1);
+      }
+  
+***************
+*** 838,841 ****
+--- 841,854 ----
+        memcpy(&de.isorec.extent, mrootp->extent, 8);      
+      }
++   else if (cdwrite_data != NULL)             /* create multisession image     */
++           {                                  /* but discard all previous data */
++              char *sec_no = strchr(cdwrite_data, ',');
++              if (sec_no == NULL)
++              {  fprintf(stderr, "Malformed cdwrite parameters\n");
++                 exit(1);
++              }
++              sec_no++;
++              session_start = last_extent = last_extent_written = atol(sec_no);
++           }
+  
+    /*
+***************
+*** 1014,1018 ****
+     */
+    if (print_size){
+! 	  discimage = fopen("/dev/null", "w");
+  	  if (!discimage){
+  		  fprintf(stderr,"Unable to open /dev/null\n");
+--- 1027,1031 ----
+     */
+    if (print_size){
+! 	  discimage = fopen("/dev/null", "wb");
+  	  if (!discimage){
+  		  fprintf(stderr,"Unable to open /dev/null\n");
+***************
+*** 1020,1024 ****
+  	  }
+    } else if (outfile){
+! 	  discimage = fopen(outfile, "w");
+  	  if (!discimage){
+  		  fprintf(stderr,"Unable to open disc image file\n");
+--- 1033,1037 ----
+  	  }
+    } else if (outfile){
+! 	  discimage = fopen(outfile, "wb");
+  	  if (!discimage){
+  		  fprintf(stderr,"Unable to open disc image file\n");
+***************
+*** 1026,1031 ****
+  
+  	  };
+!   } else
+! 	  discimage =  stdout;
+  
+    /* Now assign addresses on the disc for the path table. */
+--- 1039,1048 ----
+  
+  	  };
+!   } else{
+! #ifdef __OS2    /* stdout is text mode in OS/2, even if default set to binary */ 
+!          _fsetmode(stdout,"b");
+! #endif
+!          discimage = stdout;
+!          }
+  
+    /* Now assign addresses on the disc for the path table. */

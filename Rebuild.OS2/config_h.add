@@ -1,0 +1,10 @@
+
+/*--rl 1998/99 ----------------------*/
+#define NON_UNIXFS
+#define S_ISBLK(x)        (0)
+#define readlink(x,y,z)   (0)
+#define lstat(x,y)        stat(x,y)
+#define R_OK              4
+#define HAVE_DIRENT_H
+#define __OS2
+/*-----------------------------------*/

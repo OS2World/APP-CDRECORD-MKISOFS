@@ -1,0 +1,146 @@
+==================
+ MKISOFS for OS/2
+==================
+
+This is a straight OS/2 port of the MKISOFS unix utility for CDROM image
+file creation. It is based on the version 1.12b4 source code of MKISOFS.
+There is included support for Joliet longnames, bootable CD and multisession. 
+
+How to run MKISOFS.EXE? In order to run the OS/2 version of MKISOFS.EXE, 
+EMX runtime dlls (v0.9c or later) have to be present the LIBPATH.
+To learn the syntax, please read the DOCS\MKISOFS.TXT file. Also MKISOFS.EXE
+may be executed without any options to show some help screen. For those
+people having a unix style man viewer, the original MKISOFS.8 manual file 
+is included. Please note that the syntax of MKISOFS has partly changed 
+from version 1.11 to 1.12.
+
+How to burn the image file onto CD:
+-----------------------------------
+ * CDRecord/2:
+    (drivers: OS2ASPI.DMD, ASPIROUT.SYS)
+   Please read the documentation of the CDRecord/2 program.
+ * RSJ CD-Writer:
+    (drivers: OS2ASPI.DMD, RSJSCSI.SYS)
+   Make sure that the MKISOFS output file has a .TRK extension. Simply 
+   drag the image file from its WPS folder into the open CDVIEW writer 
+   window. First press the red button to record, and finally the CD-symbol 
+   button to close the session.
+ * DAO/16-bit:
+    (drivers: OS2ASPI.DMD, VASPI.SYS)
+   This package of freeware DOS tools is available for downloaded from 
+   http://www.goldenhawk.com. The image file produced by MKISOFS.EXE can be
+   transferred to the CD using the FILE2CD.EXE program in OS/2's DOS emulation. 
+   While running this program in a DOS command line window, there should be 
+   avoided to run other programs concurrently.
+
+File naming conventions:
+------------------------
+ * ISO9660 level_1 filenames (default):   8.3 uppercase chars
+ * -or- ISO9660 level_2 longnames ("-l"): 32 uppercase chars, single dot
+   All file names will be converted to uppercase and and/or truncated to
+   fulfill the ISO9660 specs. In case that truncation would cause duplicate 
+   file names, those files receive a "*.nnn" numerical extension instead.
+ * RockRidge UNIX-style longnames ("-r";"-R")
+ * Joliet Windows-style longnames ("-J")
+
+Multisession support:
+---------------------
+ * For proper layout of a subsequent session's image file, the CD must
+   be present and accessible through an OS/2 drive letter. Alternately
+   (for the 2nd session only), the image file name of the first session
+   can be specified to read directly from that file.
+ * To create an image file for session 2,3,... ,  both the 
+   "-C ppppp,nnnnn" and the "-M x:" options need to be specified:
+   The "-C" option is expected to give the start address of the previous
+   session followed by the start address of the new session to be created.
+   You may obtain those numbers by running the CDRecord/2 program with
+   the "-msinfo" option.
+   The "-M x:" option needs to know the drive letter of the CD,
+   but without any path given. If an old image file should be
+   accessed instead, make sure that the name specified here contains
+   at least one forward slash character, like "-M./oldimg.trk".
+ * When burning multisession CDs, make sure to write XA tracks only.   
+ * MKISOFS requires RockRidge file names ("-R") to be present in the 
+   previous session, in order to be able to merge the previous session's 
+   files into a new session. 
+ * If the data already present on the CD should not be included into
+   the new session, specify the "-C ppppp,nnnnn" option only but not
+   the "-M" option. The first number given with "-C" is a don't care
+   in that case. Still, this "CD-R recycling" will only work if the data 
+   already present on the CD has been written in multisession mode.
+   The same procedure applies if a data session shall be added behind an 
+   audio session (CD-Extra). 
+
+Bootable CD support:
+--------------------
+ * To create a bootable CD, the image file of a single bootable floppy 
+   disk is required. In order to boot OS/2 from the CD, the bootable
+   floppy has to be adapted first for this task. There is available 
+   some detailed documentation and some drivers (CDBOOT.ZIP) to download 
+   from http://hobbes.nmsu.edu.
+ * To include the boot structures into the CD image, "-b path" option
+   must be specified. The path given here is the position of the boot 
+   floppy's image file, as it is placed on the target CD (not on the 
+   source disk).
+ * The "-c" option and/or a self-written boot catalog file ususally
+   are not needed, except for CDs offering multiple boot images.
+
+Wildcard support:
+-----------------
+ * The OS/2 version can handle wildcards in the source path.
+   In contrast to standard OS/2 wildcard handling, the directory name 
+   is also allowed to contain "*" and/or "?" characters. 
+ * Wildcards are also supported with the exclusion option ("-m" or "-x")
+   if the match string is following the option prefix ("-m") without
+   any space characters in between. Be aware of the case sensitivity
+   discussed below.
+
+Known problems:
+---------------
+ * It is highly recommended to use the forward slash "/" only
+   as directory separator instead of the OS/2 standard "\". 
+ * The "-m" or "-x" exclude option has special syntax requirements:
+   The leading part of an exclusion string must be the exact copy of the 
+   source path's command line string. The trailing part of any exclusion 
+   string must match the true case of the directory/file to be excluded.
+     e.g. to create a CD image of d:\archive, except d:archive\TEMP, call
+             MKISOFS -o c:/CD_Image.Dat -m D:/ArChive/TEMP D:/ArChive
+ * OS/2 file names containing special characters are not properly
+   translated to Joliet (Unicode) names.
+
+ * Due to bios limitations, multisession CDs usually can't boot,
+   even if the last session has been made bootable properly.
+ * In the multisession support, while reading a previous session from CD 
+   using the "-Mx:" option, there may occur the following message: 
+   "CD read error ..., trying LongRead". This warning is caused by 
+   a limitation of the standard OS/2 CDROM drivers. It is indicating
+   that MKISOFS must use a workaround.
+ * Certain CD writer models give only access to the first session of a 
+   multisession CD when reading the CD through an OS/2 drive letter.
+   Though, this does not affect the ability of MKISOFS to read any session 
+   present on the CD while processing the merge ("-M") option. 
+ * If the first session of a CD is audio, the standard OS/2 CDRom drivers 
+   usually do not recognize any subsequent data sessions.
+ * The CDRecord/2 SCSI library for multisession support is not included 
+   with this MKISOFS port. There is available a different MKISOFS port
+   bundled with CDRecord/2.
+
+Rebuild MKISOFS:
+----------------
+ * Install the GCC/EMX compiler and the optionally the LXLITE package.
+ * Download the source code package called "mkisofs-1_12b4_tar.gz" or similar,
+   unpack it to any working directory.
+ * Append CONFIG_H.ADD to the original CONFIG.H.IN, resulting to CONFIG.H.
+ * Modify the original files MKISOFS.C, MULTI.C and DEFAULTS.H,
+   using the diff files MKISOFS.C.DIFF, MULTI.C.DIFF and DEFAULTS.H.DIFF.
+ * Copy CDACCESS.C and BUILD.CMD to the mkisofs-1.12b4 subdirectory.
+ * Run BUILD.CMD from the mkisofs-1.12b4 subdirectory.  (makefiles not used) 
+
+
+
+!! Warning: The use of MKISOFS.EXE is at your own risk !!
+
+
+Robert Lalla, Loerrach, Germany      Jan 16, 1999
+
+ rlalla@stepnet.de

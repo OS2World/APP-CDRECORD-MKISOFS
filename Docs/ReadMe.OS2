@@ -1,0 +1,97 @@
+MKISOFS for OS/2
+----------------
+
+This is a straight OS/2 port of the MKISOFS unix utility for CDROM image
+file creation. It is based on the version 1.12b4 source code of MKISOFS.
+There is support included for Joliet names, bootable CD and multisession. 
+
+How to run MKISOFS.EXE? In order to run the OS/2 version of MKISOFS.EXE, 
+EMX runtime dlls (v0.9c or later) have to be present the LIBPATH.
+To learn the syntax, please read the DOCS\MKISOFS.TXT file. For those 
+running a unix style man viewer, the original MKISOFS.8 manual file is 
+also included. Please note that the syntax of MKISOFS has partly changed 
+from version 1.11 to 1.12.
+
+How to burn the image file onto CD:
+ * CDRecord:
+   Please read the documentation of this program.
+ * RSJ CD-Writer:
+   Make sure that the MKISOFS output file has a .TRK extension. Simply 
+   drag the image file from its WPS folder into the open CDVIEW writer 
+   window. Press the "record" button to record and later the "CD" button 
+   to finalize. (The RSJ_HEAD utility is not needed any more)
+
+File naming conventions:
+ * ISO9660 level_1 filenames (default):   8.3 uppercase chars
+ * -or- ISO9660 level_2 longnames ("-l"): 32 uppercase chars, single dot
+   All file names will be converted to uppercase and and/or truncated to
+   fulfill the ISO9660 specs. In case that truncation would cause duplicate 
+   file names, those files receive a "*.nnn" numerical extension instead.
+ * RockRidge UNIX-style longnames ("-r";"R")
+ * Joliet Windows-style longnames ("-J")
+
+Multisession support:
+ * For proper layout of a subsequent session's image file, the CD must
+   be present and accessible through an OS/2 drive letter. Alternately
+   for the 2nd session only, the image file of the first session can
+   be specified.
+ * To create an image file for session 2,3,... ,  both the 
+   "-M mmmmm,nnnnn" and the "-C x:" options need to be specified:
+   The "-M" option is expecting the start address of the previous
+   session and the start address of the new session to be created.
+   You may obtain those numbers by calling the CDRecord program with
+   the "-msinfo" option. 
+   The "-C" option needs to know the drive letter of the CD, with ":"
+   but without any path specified. If an old image file should be
+   accessed instead, make sure that the name specified here contains
+   at least one forward slash ("/") character.
+ * When writing multisession CDs, make sure to use XA tracks only.   
+
+Bootable CD support:
+ * To create a bootable CD, the image file of a single bootable floppy 
+   disk is required. In order to boot OS/2 from the CD, the bootable
+   floppy has to be adapted first for this task. There is available 
+   some documentation and some drivers (CDBOOT.ZIP) to download from 
+   http://hobbes.nmsu.edu.
+ * To include the boot structures into the CD image, "-b path" option
+   must be specified. The path given here is the position of the boot 
+   floppy's image file, as it is placed on the target CD (not on the 
+   source disk).
+ * The "-c" option and a self-written boot catalog are only needed
+   for CDs having multiple boot images.
+
+Wildcard support:
+ * Starting with this release, the OS/2 version can handle wildcards
+   in the source path. Not only the file names but also the directory
+   names are allowed to contain "*" and/or "?" characters. 
+
+Known restrictions:
+ * It is highly recommended to use the forward slash "/" only
+   as directory separator instead of the OS/2 standard "\". 
+ * The "-x" exclude option has special syntax requirements. The leading
+   part of an exclusion string must be the exact copy of the source 
+   path's command line string. The trailing part of any exclusion string
+   must match the true case of the directory/file to be excluded.
+     e.g. to create a CD image of d:\archive, except d:archive\TEMP, call
+             MKISOFS -o c:/CD_Image.Dat -x D:/Archive/TEMP D:/Archive
+ * The "-c" option specified without "-b" option may crash the program.
+ * Due to bios limitations, multisession CDs usually can't boot even
+   if made bootable properly.
+ * Mixed multisession CDs, where the previous session contains audio
+   tracks, are not supported.
+
+Rebuild MKISOFS:
+ * Install the GCC/EMX compiler.
+ * Download the source code called   mkisofs-1_12b4_tar.gz  or similar.
+ * Append CONFIG_H.ADD to the original CONFIG.H.IN, resulting to CONFIG.H.
+ * Modify the original MKISOFS.C using a diff file called MKISOFS.DIF.
+ * Adapt BUILD.CMD conforming to your EMX installation path and run it.
+   (makefiles not used) 
+
+
+!!Warning: The use of MKISOFS.EXE is at your own risk!!
+
+
+Robert Lalla, Loerrach, Germany      Jan 8, 1999
+
+ rlalla@stepnet.de

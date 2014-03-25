@@ -1,0 +1,15 @@
+*** multi.c.ori	Tue Jun  2 03:40:38 1998
+--- multi.c	Sat Jan 23 14:48:16 1999
+***************
+*** 1111,1118 ****
+--- 1111,1120 ----
+         * The check_prev_session function looks for an identical entry in
+         * the previous session.  If we see it, then we copy the extent
+         * number to s_entry, and cross it off the list.
+         */
++       odpnt=NULL; /* clear previous match of check_prev_session()             */
++                   /* check_prev_session() won't update odpnt, if no new match */
+        check_prev_session(orig_contents, n_orig, s_entry,
+  			 &statbuf, &lstatbuf, &odpnt);
+  
+        if(S_ISDIR(statbuf.st_mode) && odpnt != NULL)
